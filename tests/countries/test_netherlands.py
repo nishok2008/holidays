@@ -71,8 +71,12 @@ class TestNetherlands(CommonCountryTests, TestCase):
 
     def test_queens_day(self):
         name = "Koninginnedag"
-        self.assertHolidayName(
-            name,
+        dts = (
+            "1979-04-30",
+            "1990-04-30",
+            "2013-04-30",
+        )
+        obs_dts = (
             "1967-05-01",
             "1972-05-01",
             "1978-05-01",
@@ -80,25 +84,25 @@ class TestNetherlands(CommonCountryTests, TestCase):
             "1995-04-29",
             "2000-04-29",
             "2006-04-29",
-            "2013-04-30",
         )
-        self.assertHolidayName(name, range(self.start_year, 2014))
-        self.assertNoHolidayName(
-            name,
+        nominal_dts = (
             "1967-04-30",
             "1972-04-30",
             "1978-04-30",
-            "1995-04-30",
             "1989-04-30",
+            "1995-04-30",
             "2000-04-30",
             "2006-04-30",
         )
+        self.assertHolidayName(name, dts, obs_dts)
+        self.assertNonObservedHolidayName(name, nominal_dts)
+        self.assertNoHolidayName(name, nominal_dts)
+        self.assertHolidayName(name, range(self.start_year, 2014))
         self.assertNoHolidayName(name, range(2014, self.end_year))
 
     def test_king_day(self):
         name = "Koningsdag"
-        self.assertHolidayName(
-            name,
+        dts = (
             "2016-04-27",
             "2017-04-27",
             "2018-04-27",
@@ -108,30 +112,36 @@ class TestNetherlands(CommonCountryTests, TestCase):
             "2022-04-27",
             "2023-04-27",
             "2024-04-27",
+        )
+        obs_dts = (
+            "2014-04-26",
             "2025-04-26",
             "2031-04-26",
             "2036-04-26",
         )
-        self.assertHolidayName(name, range(2014, self.end_year))
-        self.assertNoHolidayName(
-            name,
+        nominal_dts = (
             "2014-04-27",
             "2025-04-27",
             "2031-04-27",
             "2036-04-27",
         )
+        self.assertHolidayName(name, dts, obs_dts)
+        self.assertNonObservedHolidayName(name, nominal_dts)
+        self.assertNoHolidayName(name, nominal_dts)
+        self.assertHolidayName(name, range(2014, self.end_year))
         self.assertNoHolidayName(name, range(self.start_year, 2014))
 
     def test_liberation_day(self):
         name = "Bevrijdingsdag"
-        # PUBLIC.
         self.assertHolidayName(
             name, (f"{year}-05-05" for year in self.full_range if year % 5 == 0)
         )
         self.assertNoHolidayName(
             name, (f"{year}-05-05" for year in self.full_range if year % 5 != 0)
         )
-        # OPTIONAL.
+
+    def test_liberation_day_optional(self):
+        name = "Bevrijdingsdag"
         self.assertOptionalHolidayName(
             name, (f"{year}-05-05" for year in range(1982, self.end_year))
         )
@@ -150,7 +160,7 @@ class TestNetherlands(CommonCountryTests, TestCase):
         )
         self.assertHolidayName(name, self.full_range)
 
-    def test_whit_sunday(self):
+    def test_pentecost(self):
         name = "Eerste pinksterdag"
         self.assertHolidayName(
             name,
@@ -163,7 +173,7 @@ class TestNetherlands(CommonCountryTests, TestCase):
         )
         self.assertHolidayName(name, self.full_range)
 
-    def test_whit_monday(self):
+    def test_pentecost_monday(self):
         name = "Tweede pinksterdag"
         self.assertHolidayName(
             name,
@@ -181,6 +191,48 @@ class TestNetherlands(CommonCountryTests, TestCase):
 
     def test_second_day_of_christmas(self):
         self.assertHolidayName("Tweede kerstdag", (f"{year}-12-26" for year in self.full_range))
+
+    def test_2014(self):
+        self.assertHolidaysInYear(
+            2014,
+            ("2014-01-01", "Nieuwjaarsdag"),
+            ("2014-04-18", "Goede vrijdag"),
+            ("2014-04-20", "Eerste paasdag"),
+            ("2014-04-21", "Tweede paasdag"),
+            ("2014-04-26", "Koningsdag"),
+            ("2014-05-29", "Hemelvaartsdag"),
+            ("2014-06-08", "Eerste pinksterdag"),
+            ("2014-06-09", "Tweede pinksterdag"),
+            ("2014-12-25", "Eerste kerstdag"),
+            ("2014-12-26", "Tweede kerstdag"),
+        )
+
+    def test_2014_optional(self):
+        self.assertOptionalHolidaysInYear(
+            2014,
+            ("2014-05-05", "Bevrijdingsdag"),
+        )
+
+    def test_2022(self):
+        self.assertHolidaysInYear(
+            2022,
+            ("2022-01-01", "Nieuwjaarsdag"),
+            ("2022-04-15", "Goede vrijdag"),
+            ("2022-04-17", "Eerste paasdag"),
+            ("2022-04-18", "Tweede paasdag"),
+            ("2022-04-27", "Koningsdag"),
+            ("2022-05-26", "Hemelvaartsdag"),
+            ("2022-06-05", "Eerste pinksterdag"),
+            ("2022-06-06", "Tweede pinksterdag"),
+            ("2022-12-25", "Eerste kerstdag"),
+            ("2022-12-26", "Tweede kerstdag"),
+        )
+
+    def test_2022_optional(self):
+        self.assertOptionalHolidaysInYear(
+            2022,
+            ("2022-05-05", "Bevrijdingsdag"),
+        )
 
     def test_l10n_default(self):
         self.assertLocalizedHolidays(
